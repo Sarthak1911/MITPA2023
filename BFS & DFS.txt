@@ -1,0 +1,246 @@
+#include<iostream>
+using namespace std;
+#define MAX 50
+
+
+struct node
+{
+    int vertex_no;
+    node *next;
+};
+
+
+class Graph
+{
+    private:
+        int no_of_vertex,no_of_edges;
+        node *head_ptr[MAX];
+
+
+    public:
+        Graph()
+        {
+           cout<<"Enter the number of vertices: ";
+           cin>>no_of_vertex;
+           for(int i=0;i<no_of_vertex;i++)
+           {
+              head_ptr[i]=NULL;
+           }
+        }
+        void Create_Graph();
+        void Display_Graph();
+        void BFS();
+        void DFS(int v,int arr[]);
+        void DFS_Traversal();
+};
+
+
+void Graph::DFS(int v, int visited[])
+{
+    visited[v] = 1;
+    cout << v << " ";
+
+
+    node* curr = head_ptr[v];
+    while (curr != NULL)
+    {
+        int adj_vertex = curr->vertex_no;
+        if (visited[adj_vertex] == 0)
+        {
+            DFS(adj_vertex, visited);
+        }
+        curr = curr->next;
+    }
+}
+
+
+void Graph::DFS_Traversal()
+{
+    int visited[MAX] = { 0 };
+    int start_vertex;
+
+
+    cout << "Enter the Starting Vertex for DFS: ";
+    cin >> start_vertex;
+
+
+    cout << "DFS Traversal: ";
+    DFS(start_vertex, visited);
+    cout << endl;
+}
+
+
+void Graph::Create_Graph()
+{
+    char ch;
+    node *temp,*curr;
+
+
+    for(int i=0;i<no_of_vertex;i++)
+    {
+        for(int j=0;j<no_of_vertex;j++)
+        {
+            if(i==j)
+            {
+                continue;
+            }
+            cout<<"Whether "<<i<<" "<<j<<" are adjacent vertex or not? Y/N : \n";
+            cin>>ch;
+            if(ch=='Y'||ch=='y')
+            {
+                temp=new node;
+                temp->vertex_no=j;
+                temp->next=NULL;
+
+
+            if(head_ptr[i]==NULL)
+            {
+                head_ptr[i]=temp;
+            }
+            else
+            {
+                curr=head_ptr[i];
+                while(curr->next!=NULL)
+                {
+                    curr=curr->next;
+                }
+                curr->next=temp;
+            }
+        }
+        }
+    }
+}
+
+
+void Graph::Display_Graph()
+{
+    node *curr;
+
+
+    cout<<"The Entered Graph is "<<endl;
+
+
+    for(int i=0;i<no_of_vertex;i++)
+    {
+        curr=head_ptr[i];
+        if(curr!=NULL)
+        {
+            cout<<i<<"->";
+            while(curr!=NULL)
+            {
+                cout<<curr->vertex_no<<"->";
+                curr=curr->next;
+            }
+            cout<<"Null";
+        }
+        else
+        {
+            cout<<"Null";
+        }
+        cout<<endl;
+    }
+}
+
+
+
+
+void Graph::BFS()
+{
+    int visited[MAX],i,start_vertex,vertex;
+    int Front=-1,Rear=-1,Queue[MAX];
+    node *curr;
+
+
+    for(i=0;i<MAX;i++)
+        visited[i]=0;
+
+
+    //Initialization
+    cout<<"Enter the Starting Vertex for BFS ";
+    cin>>start_vertex;
+
+
+   //Enqueue the Starting Vertex
+    Queue[++Rear]=start_vertex;
+    Front++; //For the first Element increment front also
+    visited[start_vertex]=1;
+
+
+    while(Front!=-1)
+    {
+        //Dequeue
+        vertex=Queue[Front++];
+
+
+        if(Front>Rear)
+            Front=Rear=-1;
+
+
+        cout<<vertex<<" ";
+
+
+        curr= head_ptr[vertex];
+       // cout<<curr->vertex_no<<" ";
+
+
+        while(curr!=NULL)
+        {
+
+
+            if (visited[curr->vertex_no]==0)
+            {
+                //Enqueue
+                Queue[++Rear]=curr->vertex_no;
+                if(Front==-1)
+                    Front++;
+                visited[curr->vertex_no]=1;
+                //Traverse to next node
+
+
+            }
+            curr=curr->next;
+
+
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+}
+
+
+int main()
+{
+    Graph g;
+    int choice;
+    char s;
+    do{
+        cout<<"1.Create Graph\n2.Display Graph\n3.Perform DFS\n4.Perform BFS";
+        cout<<"\nEnter your choice: \n";
+        cin>>choice;
+        switch(choice)
+        {
+           case 1:g.Create_Graph();
+                   break;
+           case 2:g.Display_Graph();
+                    break;
+           case 3:g.DFS_Traversal();
+                    break;
+            case 4:g.BFS();
+                    break;
+            default:cout<<"Wrong Choice!!"<<endl;
+                    break;
+        }
+        cout<<"\nDo you want to continue? Y/N: \n";
+        cin>>s;
+    }while(s=='Y'||s=='y');
+
+
+}

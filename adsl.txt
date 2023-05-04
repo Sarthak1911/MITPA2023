@@ -1,0 +1,1868 @@
+
+
+
+
+
+_________________________________________________________________________________
+
+ADSL assignment 3
+
+problem : Create a Binary Search tree and find its mirror image. Print original & new tree level wise. 
+Find height & print leaf nodes.
+
+code:
+
+#include <iostream> 
+#include<bits/stdc++.h> 
+using namespace std; 
+struct Node 
+{ 
+int data; 
+Node *left, *right; 
+}; 
+Node *newNode(int data) 
+{ 
+Node *temp = new Node(); 
+temp->data = data; 
+temp->left = temp->right = NULL; 
+return temp; 
+} 
+Node *insert(Node *root, int data) 
+{ 
+if(root == NULL) return newNode(data); 
+if(data < root->data) root->left = insert(root->left, data); 
+else root->right = insert(root->right, data); 
+return root; 
+} 
+void inOrder(Node *root) 
+{ 
+if(root == NULL) return; 
+inOrder(root->left); 
+cout << root->data << " "; 
+inOrder(root->right); 
+}
+void mirror(Node *root) 
+{ 
+if(root == NULL) return; 
+mirror(root->left); 
+mirror(root->right); 
+swap(root->left, root->right); 
+} 
+int height(Node *root) 
+{ 
+if(root == NULL) return 0; 
+return max(height(root->left), height(root->right)) + 1; } 
+void printLeafNodes(Node *root) 
+{ 
+if (!root) 
+return; 
+if (!root->left && !root->right) 
+{ 
+cout << root->data << " "; 
+return; 
+} 
+if (root->left) 
+printLeafNodes(root->left); 
+if (root->right) 
+printLeafNodes(root->right); 
+} 
+void printLevelOrder(Node *root) 
+{ 
+if(root == NULL) return; 
+queue<Node*> q; 
+q.push(root); 
+while(!q.empty()){ 
+int count = q.size(); 
+while(count--){ 
+Node *temp = q.front(); 
+q.pop(); 
+cout << temp->data << " "; 
+if(temp->left) q.push(temp->left); 
+if(temp->right) q.push(temp->right); 
+} 
+cout << endl; 
+} 
+}
+int main() 
+{ 
+int ch; 
+Node *root = NULL; 
+while (ch!=6) 
+{ 
+cout<<"\nMenu\n1.Create\n2.Inorder Disp\n3.Mirror Tree \n4.Height of the tree \n5.Leaf nodes \n6.Exit \nEnter your choice : "; 
+cin>>ch; 
+switch(ch) 
+{ 
+case 1: 
+{ 
+cout<<"Enter the number of node you want to insert: "; 
+int t; 
+cin>>t; 
+while(t--) 
+{ 
+int data; 
+cin>>data; 
+root=insert(root,data); 
+} 
+break; 
+} 
+case 2: 
+{ 
+cout <<endl<< "Original Tree in inorder : "; 
+inOrder(root); 
+cout << endl; 
+cout << "Original Tree in level order : " << endl; 
+printLevelOrder(root); 
+cout << endl; 
+break; 
+} 
+case 3: 
+{ 
+mirror(root); 
+cout <<endl<< "Mirrored Tree in inorder : "; 
+inOrder(root); 
+cout << endl; 
+cout << "Mirrored Tree in level order : " << endl; 
+printLevelOrder(root); 
+cout << endl; 
+break; 
+} 
+case 4:
+{ 
+cout <<endl<< "Height of tree : " << height(root)<<endl ; 
+break; 
+} 
+case 5: 
+{ 
+cout <<endl<< "Leaf nodes of tree are : "<<endl ; 
+printLeafNodes(root); 
+break; 
+} 
+case 6: 
+{ 
+break; 
+} 
+} 
+} 
+return 0; 
+} 
+
+
+Output : 
+
+
+ 
+
+ 
+
+
+
+
+
+
+
+________________________________________________________________________________________________
+
+ADSL assignment 4
+
+
+Problem statement - Create inorder threaded binary search tree and perform the traversals.
+
+Code:
+
+
+#include <iostream>
+#define MAX_VALUE 65536
+using namespace std;
+class N
+{ // node declaration
+public:
+    int k;
+    N *l, *r;
+    bool leftTh, rightTh;
+};
+class ThreadedBinaryTree
+{
+private:
+    N *root;
+
+
+public:
+    ThreadedBinaryTree()
+    { // constructor to initialize the variables
+        root = new N();
+        root->r = root->l = root;
+        root->leftTh = true;
+        root->k = MAX_VALUE;
+    }
+    void insert(int key)
+    {
+        N *p = root;
+        for (;;)
+        {
+            if (p->k < key)
+            { // move to right thread
+                if (p->rightTh)
+                    break;
+                p = p->r;
+            }
+            else if (p->k > key)
+            { // move to left thread
+                if (p->leftTh)
+                    break;
+                p = p->l;
+            }
+            else
+            {
+                return;
+            }
+        }
+        N *temp = new N();
+        temp->k = key;
+        temp->rightTh = temp->leftTh = true;
+        if (p->k < key)
+        {
+            temp->r = p->r;
+            temp->l = p;
+            p->r = temp;
+            p->rightTh = false;
+        }
+        else
+        {
+            temp->r = p;
+            temp->l = p->l;
+            p->l = temp;
+            p->leftTh = false;
+        }
+    }
+    void inorder()
+    { // print the tree
+        N *temp = root, *p;
+        for (;;)
+        {
+            p = temp;
+            temp = temp->r;
+            if (!p->rightTh)
+            {
+                while (!temp->leftTh)
+                {
+                    temp = temp->l;
+                }
+            }
+            if (temp == root)
+                break;
+            cout << temp->k << " ";
+        }
+        cout << endl;
+    }
+};
+int main()
+{
+    ThreadedBinaryTree tbt;
+    cout << "Threaded Binary Tree\n";
+    tbt.insert(56);
+    tbt.insert(23);
+    tbt.insert(89);
+    tbt.insert(85);
+    tbt.insert(20);
+    tbt.insert(30);
+    tbt.insert(12);
+    tbt.inorder();
+    cout << "\n";
+}
+
+
+Output:
+ 
+
+
+
+
+
+
+
+
+_________________________________________________________________________________________________
+
+ADSL Assignment 5 
+
+
+Problem Statement : Represent a given graph using adjacency list and perform DFS and BFS.
+
+Code : 
+
+#include<iostream>
+using namespace std;
+#define MAX 50
+
+struct node
+{
+    int vertex_no;
+    node *next;
+};
+
+class Graph
+{
+    private:
+        int no_of_vertex,no_of_edges;
+        node *head_ptr[MAX];
+
+    public:
+        Graph()
+        {
+           cout<<"Enter the number of vertices: ";
+           cin>>no_of_vertex;
+           for(int i=0;i<no_of_vertex;i++)
+           {
+              head_ptr[i]=NULL;
+           }
+        }
+        void Create_Graph();
+        void Display_Graph();
+        void BFS();
+        void DFS(int v,int arr[]);
+        void DFS_Traversal();
+};
+
+void Graph::DFS(int v, int visited[])
+{
+    visited[v] = 1;
+    cout << v << " ";
+
+    node* curr = head_ptr[v];
+    while (curr != NULL)
+    {
+        int adj_vertex = curr->vertex_no;
+        if (visited[adj_vertex] == 0)
+        {
+            DFS(adj_vertex, visited);
+        }
+        curr = curr->next;
+    }
+}
+
+void Graph::DFS_Traversal()
+{
+    int visited[MAX] = { 0 };
+    int start_vertex;
+
+    cout << "Enter the Starting Vertex for DFS: ";
+    cin >> start_vertex;
+
+    cout << "DFS Traversal: ";
+    DFS(start_vertex, visited);
+    cout << endl;
+}
+
+void Graph::Create_Graph()
+{
+    char ch;
+    node *temp,*curr;
+
+    for(int i=0;i<no_of_vertex;i++)
+    {
+        for(int j=0;j<no_of_vertex;j++)
+        {
+            if(i==j)
+            {
+                continue;
+            }
+            cout<<"Whether "<<i<<" "<<j<<" are adjacent vertex or not? Y/N : \n";
+            cin>>ch;
+            if(ch=='Y'||ch=='y')
+            {
+                temp=new node;
+                temp->vertex_no=j;
+                temp->next=NULL;
+
+            if(head_ptr[i]==NULL)
+            {
+                head_ptr[i]=temp;
+            }
+            else
+            {
+                curr=head_ptr[i];
+                while(curr->next!=NULL)
+                {
+                    curr=curr->next;
+                }
+                curr->next=temp;
+            }
+        }
+        }
+    }
+}
+
+void Graph::Display_Graph()
+{
+    node *curr;
+
+    cout<<"The Entered Graph is "<<endl;
+
+    for(int i=0;i<no_of_vertex;i++)
+    {
+        curr=head_ptr[i];
+        if(curr!=NULL)
+        {
+            cout<<i<<"->";
+            while(curr!=NULL)
+            {
+                cout<<curr->vertex_no<<"->";
+                curr=curr->next;
+            }
+            cout<<"Null";
+        }
+        else
+        {
+            cout<<"Null";
+        }
+        cout<<endl;
+    }
+}
+
+
+void Graph::BFS()
+{
+    int visited[MAX],i,start_vertex,vertex;
+    int Front=-1,Rear=-1,Queue[MAX];
+    node *curr;
+
+    for(i=0;i<MAX;i++)
+        visited[i]=0;
+
+    //Initialization
+    cout<<"Enter the Starting Vertex for BFS ";
+    cin>>start_vertex;
+
+   //Enqueue the Starting Vertex
+    Queue[++Rear]=start_vertex;
+    Front++; //For the first Element increment front also
+    visited[start_vertex]=1;
+
+    while(Front!=-1)
+    {
+        //Dequeue
+        vertex=Queue[Front++];
+
+        if(Front>Rear)
+            Front=Rear=-1;
+
+        cout<<vertex<<" ";
+
+        curr= head_ptr[vertex];
+       // cout<<curr->vertex_no<<" ";
+
+        while(curr!=NULL)
+        {
+
+            if (visited[curr->vertex_no]==0)
+            {
+                //Enqueue
+                Queue[++Rear]=curr->vertex_no;
+                if(Front==-1)
+                    Front++;
+                visited[curr->vertex_no]=1;
+                //Traverse to next node
+
+            }
+            curr=curr->next;
+
+        }
+    }
+
+
+
+
+
+}
+
+int main()
+{
+    Graph g;
+    int choice;
+    char s;
+    do{
+        cout<<"1.Create Graph\n2.Display Graph\n3.Perform DFS\n4.Perform BFS";
+        cout<<"\nEnter your choice: \n";
+        cin>>choice;
+        switch(choice)
+        {
+           case 1:g.Create_Graph();
+                   break;
+           case 2:g.Display_Graph();
+                    break;
+           case 3:g.DFS_Traversal();
+                    break;
+            case 4:g.BFS();
+                    break;
+            default:cout<<"Wrong Choice!!"<<endl;
+                    break;
+        }
+        cout<<"\nDo you want to continue? Y/N: \n";
+        cin>>s;
+    }while(s=='Y'||s=='y');
+
+}
+
+Output : 
+
+PS E:\ADS Lab> cd "e:\ADS Lab\" ; if ($?) { g++ Assignment5.cpp -o Assignment5 } ; if ($?) { .\Assignment5 }
+Enter the number of vertices: 3
+1.Create Graph
+2.Display Graph
+3.Perform DFS
+4.Perform BFS
+Enter your choice: 
+1
+Whether 0 1 are adjacent vertex or not? Y/N : 
+Y
+Whether 0 2 are adjacent vertex or not? Y/N : 
+Y
+Whether 1 0 are adjacent vertex or not? Y/N : 
+Y
+Whether 1 2 are adjacent vertex or not? Y/N : 
+Y
+Whether 2 0 are adjacent vertex or not? Y/N : 
+Y
+Whether 2 1 are adjacent vertex or not? Y/N : 
+N
+
+Do you want to continue? Y/N:
+Y
+1.Create Graph
+2.Display Graph
+3.Perform DFS
+4.Perform BFS
+Enter your choice:
+2
+The Entered Graph is
+0->1->2->Null
+1->0->2->Null
+2->0->Null
+
+Do you want to continue? Y/N:
+Y
+1.Create Graph
+2.Display Graph
+3.Perform DFS
+4.Perform BFS
+Enter your choice:
+3
+Enter the Starting Vertex for DFS: 0
+DFS Traversal: 0 1 2
+
+Do you want to continue? Y/N:
+Y
+1.Create Graph
+2.Display Graph
+3.Perform DFS
+4.Perform BFS
+Enter your choice:
+4
+Enter the Starting Vertex for BFS 1
+1 0 2
+Do you want to continue? Y/N:
+N
+PS E:\ADS Lab>
+
+
+
+
+
+
+_____________________________________________________________________________________________________
+ADSL Assignment 6 
+
+
+Problem Statement : Represent a given graph using an adjacency list or array and find the shortest path using Dijkstra algorithm. 
+
+
+Code : 
+
+#include <iostream>
+#include <climits>
+using namespace std;
+
+void dijkstra(int **graph, int V, int src) {
+    int dist[V];
+    bool sptSet[V];
+
+    for (int i = 0; i < V; i++) {
+        dist[i] = INT_MAX;
+        sptSet[i] = false;
+    }
+
+    dist[src] = 0;
+
+    for (int count = 0; count < V - 1; count++) {
+        int u, minDist = INT_MAX;
+        for (int v = 0; v < V; v++) {
+            if (!sptSet[v] && dist[v] <= minDist) {
+                u = v;
+                minDist = dist[v];
+            }
+        }
+
+        sptSet[u] = true;
+
+        for (int v = 0; v < V; v++) {
+            if (!sptSet[v] && graph[u][v] && dist[u] != INT_MAX
+                && dist[u] + graph[u][v] < dist[v]) {
+                dist[v] = dist[u] + graph[u][v];
+            }
+        }
+    }
+
+    cout << "Vertex \t Distance from Source" << endl;
+    for (int i = 0; i < V; i++) {
+        cout << i << " \t\t " << dist[i] << endl;
+    }
+}
+
+int main() {
+    int V;
+    cout << "Enter the number of vertices: ";
+    cin >> V;
+
+    int **graph = new int *[V];
+    for (int i = 0; i < V; i++) {
+        graph[i] = new int[V];
+    }
+
+    cout << "Enter the adjacency matrix:" << endl;
+    for (int i = 0; i < V; i++) {
+        for (int j = 0; j < V; j++) {
+            cout<<"Enter the row "<<i+1<<" column "<<j+1<<" Element : ";
+            cin >> graph[i][j];
+        }
+    }
+
+    dijkstra(graph, V, 0);
+
+    for (int i = 0; i < V; i++) {
+        delete[] graph[i];
+    }
+    delete[] graph;
+
+    return 0;
+}
+
+
+
+Output : 
+
+ 
+ 
+
+
+
+
+
+
+____________________________________________________________________________________________________________________
+
+ADSL Assignment 7
+
+
+Problem Statement : Represent a given graph using an adjacency list or array and generate a minimum spanning tree using Kruskal's or Prim’s algorithm.
+
+
+Code : 
+
+#include <iostream>
+#include <queue>
+#include <unordered_set>
+#include <utility>
+using namespace std;
+
+using edge = tuple<int, int, int>;
+
+using edge_queue = priority_queue<edge, vector<edge>, greater<edge>>;
+
+void prim(int adj_matrix[][100], int n) {
+    edge mst[n - 1];
+    unordered_set<int> visited;
+
+    visited.insert(0);
+
+    edge_queue pq;
+    for (int v = 1; v < n; ++v) {
+        pq.push(make_tuple(adj_matrix[0][v], 0, v));
+    }
+
+    int i = 0;
+    while (!pq.empty() && i < n - 1) {
+        int weight, u, v;
+        tie(weight, u, v) = pq.top();
+        pq.pop();
+
+        if (visited.count(u) && visited.count(v)) {
+            continue;
+        }
+
+        mst[i++] = make_tuple(weight, u, v);
+        int new_vertex = visited.count(u) ? v : u;
+        visited.insert(new_vertex);
+
+        for (int neighbor = 0; neighbor < n; ++neighbor) {
+            if (!visited.count(neighbor)) {
+                pq.push(make_tuple(adj_matrix[new_vertex][neighbor], new_vertex, neighbor));
+            }
+        }
+    }
+
+    cout << "Minimum Spanning Tree:" << endl;
+    for (int j = 0; j < n - 1; ++j) {
+        int weight, u, v;
+        tie(weight, u, v) = mst[j];
+        cout << u << " --(" << weight << ")-- " << v << endl;
+    }
+}
+
+int main() {
+    int adj_matrix[100][100] = {
+        {0, 5, 0, 4, 0},
+        {5, 0, 2, 1, 1},
+        {0, 2, 0, 0, 4},
+        {4, 1, 0, 0, 3},
+        {0, 1, 4, 3, 0}
+    };
+
+    prim(adj_matrix, 5);
+
+    return 0;
+}
+
+
+
+
+Output : 
+
+
+
+
+ 
+________________________________________________________________________________________________________
+
+
+adsl Assignment 7
+
+python krushkal's
+
+code:
+
+
+# Python program for Kruskal's algorithm to find
+# Minimum Spanning Tree of a given connected,
+# undirected and weighted graph
+
+
+# Class to represent a graph
+class Graph:
+
+	def __init__(self, vertices):
+		self.V = vertices
+		self.graph = []
+
+	# Function to add an edge to graph
+	def addEdge(self, u, v, w):
+		self.graph.append([u, v, w])
+
+	# A utility function to find set of an element i
+	# (truly uses path compression technique)
+	def find(self, parent, i):
+		if parent[i] != i:
+
+			# Reassignment of node's parent
+			# to root node as
+			# path compression requires
+			parent[i] = self.find(parent, parent[i])
+		return parent[i]
+
+	# A function that does union of two sets of x and y
+	# (uses union by rank)
+	def union(self, parent, rank, x, y):
+
+		# Attach smaller rank tree under root of
+		# high rank tree (Union by Rank)
+		if rank[x] < rank[y]:
+			parent[x] = y
+		elif rank[x] > rank[y]:
+			parent[y] = x
+
+		# If ranks are same, then make one as root
+		# and increment its rank by one
+		else:
+			parent[y] = x
+			rank[x] += 1
+
+	# The main function to construct MST
+	# using Kruskal's algorithm
+	def KruskalMST(self):
+
+		# This will store the resultant MST
+		result = []
+
+		# An index variable, used for sorted edges
+		i = 0
+
+		# An index variable, used for result[]
+		e = 0
+
+		# Sort all the edges in
+		# non-decreasing order of their
+		# weight
+		self.graph = sorted(self.graph,
+							key=lambda item: item[2])
+
+		parent = []
+		rank = []
+
+		# Create V subsets with single elements
+		for node in range(self.V):
+			parent.append(node)
+			rank.append(0)
+
+		# Number of edges to be taken is less than to V-1
+		while e < self.V - 1:
+
+			# Pick the smallest edge and increment
+			# the index for next iteration
+			u, v, w = self.graph[i]
+			i = i + 1
+			x = self.find(parent, u)
+			y = self.find(parent, v)
+
+			# If including this edge doesn't
+			# cause cycle, then include it in result
+			# and increment the index of result
+			# for next edge
+			if x != y:
+				e = e + 1
+				result.append([u, v, w])
+				self.union(parent, rank, x, y)
+			# Else discard the edge
+
+		minimumCost = 0
+		print("Edges in the constructed MST")
+		for u, v, weight in result:
+			minimumCost += weight
+			print("%d -- %d == %d" % (u, v, weight))
+		print("Minimum Spanning Tree", minimumCost)
+
+
+# Driver code
+if __name__ == '__main__':
+	g = Graph(4)
+	g.addEdge(0, 1, 10)
+	g.addEdge(0, 2, 6)
+	g.addEdge(0, 3, 5)
+	g.addEdge(1, 3, 15)
+	g.addEdge(2, 3, 4)
+
+	# Function call
+	g.KruskalMST()
+___________________________________________________________________________________________________
+
+
+ADSL Assignment 7
+
+python prim's
+
+
+code:
+
+# A Python3 program for
+# Prim's Minimum Spanning Tree (MST) algorithm.
+# The program is for adjacency matrix
+# representation of the graph
+
+# Library for INT_MAX
+import sys
+
+
+class Graph():
+	def __init__(self, vertices):
+		self.V = vertices
+		self.graph = [[0 for column in range(vertices)]
+					for row in range(vertices)]
+
+	# A utility function to print
+	# the constructed MST stored in parent[]
+	def printMST(self, parent):
+		print("Edge \tWeight")
+		for i in range(1, self.V):
+			print(parent[i], "-", i, "\t", self.graph[i][parent[i]])
+
+	# A utility function to find the vertex with
+	# minimum distance value, from the set of vertices
+	# not yet included in shortest path tree
+	def minKey(self, key, mstSet):
+
+		# Initialize min value
+		min = sys.maxsize
+
+		for v in range(self.V):
+			if key[v] < min and mstSet[v] == False:
+				min = key[v]
+				min_index = v
+
+		return min_index
+
+	# Function to construct and print MST for a graph
+	# represented using adjacency matrix representation
+	def primMST(self):
+
+		# Key values used to pick minimum weight edge in cut
+		key = [sys.maxsize] * self.V
+		parent = [None] * self.V # Array to store constructed MST
+		# Make key 0 so that this vertex is picked as first vertex
+		key[0] = 0
+		mstSet = [False] * self.V
+
+		parent[0] = -1 # First node is always the root of
+
+		for cout in range(self.V):
+
+			# Pick the minimum distance vertex from
+			# the set of vertices not yet processed.
+			# u is always equal to src in first iteration
+			u = self.minKey(key, mstSet)
+
+			# Put the minimum distance vertex in
+			# the shortest path tree
+			mstSet[u] = True
+
+			# Update dist value of the adjacent vertices
+			# of the picked vertex only if the current
+			# distance is greater than new distance and
+			# the vertex in not in the shortest path tree
+			for v in range(self.V):
+
+				# graph[u][v] is non zero only for adjacent vertices of m
+				# mstSet[v] is false for vertices not yet included in MST
+				# Update the key only if graph[u][v] is smaller than key[v]
+				if self.graph[u][v] > 0 and mstSet[v] == False \
+				and key[v] > self.graph[u][v]:
+					key[v] = self.graph[u][v]
+					parent[v] = u
+
+		self.printMST(parent)
+
+
+# Driver's code
+if __name__ == '__main__':
+	g = Graph(5)
+	g.graph = [[0, 2, 0, 6, 0],
+			[2, 0, 3, 8, 5],
+			[0, 3, 0, 0, 7],
+			[6, 8, 0, 0, 9],
+			[0, 5, 7, 9, 0]]
+
+	g.primMST()
+
+
+# Contributed by Divyanshu Mehta
+
+
+
+
+
+____________________________________________________________________________________________________
+
+ADSL Assignment 8
+
+cpp
+
+Problem Statement : Create a hash table and handle the collisions using linear probing with or without replacement. 
+
+
+Code : 
+
+#include <iostream>
+#include <cstdlib>
+
+#define SIZE 10   
+
+using namespace std;
+int hash_func(int key) {
+    return key % SIZE;
+}
+void insert(int hash_table[], int key) {
+    int index = hash_func(key);
+    int i = 0;
+    while (i < SIZE) {
+        if (hash_table[index] == -1) {
+            hash_table[index] = key;
+            cout << "Key " << key << " inserted at index " << index << endl;
+            return;
+        }
+        index = (index + 1) % SIZE;
+        i++;
+    }
+    cout << "Hash table is full" << endl;
+}
+void search(int hash_table[], int key) {
+    int index = hash_func(key);
+    int i = 0;
+    while (i < SIZE) {
+        if (hash_table[index] == key) {
+            cout << "Key " << key << " found at index " << index << endl;
+            return;
+        } else if (hash_table[index] == -1) {
+            cout << "Key " << key << " not found in hash table" << endl;
+            return;
+        }
+        index = (index + 1) % SIZE;
+        i++;
+    }
+    cout << "Key " << key << " not found in hash table" << endl;
+}
+void remove(int hash_table[], int key) {
+    int index = hash_func(key);
+    int i = 0;
+    while (i < SIZE) {
+        if (hash_table[index] == key) {
+            hash_table[index] = -1;
+            cout << "Key " << key << " deleted from index " << index << endl;
+            return;
+        } else if (hash_table[index] == -1) {
+            cout << "Key " << key << " not found in hash table" << endl;
+            return;
+        }
+        index = (index + 1) % SIZE;
+        i++;
+    }
+    cout << "Key " << key << " not found in hash table" << endl;
+}
+void display(int hash_table[]) {
+    cout << "Hash Table:" << endl;
+    for (int i = 0; i < SIZE; i++) {
+        cout << i << ": ";
+        if (hash_table[i] != -1) {
+            cout << hash_table[i];
+        }
+        cout << endl;
+    }
+}
+int main() {
+    int hash_table[SIZE];
+    for (int i = 0; i < SIZE; i++) {
+        hash_table[i] = -1;
+    }
+
+    insert(hash_table, 10);
+    insert(hash_table, 20);
+    insert(hash_table, 30);
+    insert(hash_table, 40);
+    insert(hash_table, 50);
+    insert(hash_table, 60);
+    insert(hash_table, 70);
+    insert(hash_table, 80);
+    insert(hash_table, 90);
+    insert(hash_table, 100);
+
+    display(hash_table);
+
+    search(hash_table, 50);
+    search(hash_table, 110);
+
+    remove(hash_table, 30);
+    remove(hash_table, 110);
+
+    display(hash_table);
+
+    return 0;
+}
+
+
+
+
+
+
+Output : 
+
+
+
+_____________________________________________________________________________________________________
+
+
+ADSL Assignment 8
+
+python
+
+Problem Statement : Create a hash table and handle the collisions using linear probing with or without replacement. 
+
+
+Code : 
+
+
+# Our own Hashnode class
+class HashNode:
+	def __init__(self, key, value):
+		self.key = key
+		self.value = value
+
+# Our own Hashmap class
+class HashMap:
+	# hash element array
+	def __init__(self):
+		self.capacity = 20
+		self.size = 0
+		self.arr = [None] * self.capacity
+		# dummy node
+		self.dummy = HashNode(-1, -1)
+
+	# This implements hash function to find index for a key
+	def hashCode(self, key):
+		return key % self.capacity
+
+	# Function to add key value pair
+	def insertNode(self, key, value):
+		temp = HashNode(key, value)
+		# Apply hash function to find index for given key
+		hashIndex = self.hashCode(key)
+		# find next free space
+		while self.arr[hashIndex] is not None and self.arr[hashIndex].key != key and self.arr[hashIndex].key != -1:
+			hashIndex += 1
+			hashIndex %= self.capacity
+		# if new node to be inserted, increase the current size
+		if self.arr[hashIndex] is None or self.arr[hashIndex].key == -1:
+			self.size += 1
+		self.arr[hashIndex] = temp
+
+	# Function to delete a key value pair
+	def deleteNode(self, key):
+		# Apply hash function to find index for given key
+		hashIndex = self.hashCode(key)
+		# finding the node with given key
+		while self.arr[hashIndex] is not None:
+			# if node found
+			if self.arr[hashIndex].key == key:
+				temp = self.arr[hashIndex]
+				# Insert dummy node here for further use
+				self.arr[hashIndex] = self.dummy
+				# Reduce size
+				self.size -= 1
+				return temp.value
+			hashIndex += 1
+			hashIndex %= self.capacity
+		# If not found return None
+		return None
+
+	# Function to search the value for a given key
+	def get(self, key):
+		# Apply hash function to find index for given key
+		hashIndex = self.hashCode(key)
+		counter = 0
+		# finding the node with given key
+		while self.arr[hashIndex] is not None:
+			# If counter is greater than capacity to avoid infinite loop
+			if counter > self.capacity:
+				return None
+			# if node found return its value
+			if self.arr[hashIndex].key == key:
+				return self.arr[hashIndex].value
+			hashIndex += 1
+			hashIndex %= self.capacity
+			counter += 1
+		# If not found return None
+		return 0
+
+	# Return current size
+	def sizeofMap(self):
+		return self.size
+
+	# Return true if size is 0
+	def isEmpty(self):
+		return self.size == 0
+
+	# Function to display the stored key value pairs
+	def display(self):
+		for i in range(self.capacity):
+			if self.arr[i] is not None and self.arr[i].key != -1:
+				print("key = ", self.arr[i].key, " value = ", self.arr[i].value)
+
+# Driver method to test map class
+if __name__ == "__main__":
+	h = HashMap()
+	h.insertNode(1, 1)
+	h.insertNode(2, 2)
+	h.insertNode(2, 3)
+	h.display()
+	print(h.sizeofMap())
+	print(h.deleteNode(2))
+	print(h.sizeofMap())
+	print(h.isEmpty())
+	print(h.get(2))
+
+
+
+
+
+
+
+
+
+_______________________________________________________________________________________________________
+
+
+Assignment-9
+
+cpp
+
+
+Problem Statement: Implementations of simple index file
+
+
+Code: 
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <cstring>
+#include <iomanip>
+
+using namespace std;
+
+// Define the structure of the index record
+struct IndexRecord {
+    char key[10];
+    long offset;
+};
+
+// Define the size of the index record
+const int RECORD_SIZE = sizeof(IndexRecord);
+
+// Function to add a new index record
+void addRecord(fstream& indexFile) {
+    IndexRecord record;
+
+    cout << "Enter the key: ";
+    cin >> record.key;
+    cout << "Enter the offset: ";
+    cin >> record.offset;
+
+    // Write the record to the end of the file
+    indexFile.seekp(0, ios::end);
+    indexFile.write(reinterpret_cast<char*>(&record), RECORD_SIZE);
+}
+
+// Function to search for an index record
+void searchRecord(fstream& indexFile) {
+    char key[10];
+    IndexRecord record;
+
+    cout << "Enter the key to search for: ";
+    cin >> key;
+
+    // Search the file for the record with the matching key
+    indexFile.seekg(0, ios::beg);
+    while (indexFile.read(reinterpret_cast<char*>(&record), RECORD_SIZE)) {
+        if (strcmp(record.key, key) == 0) {
+            cout << "Record found:" << endl;
+            cout << "Key: " << record.key << endl;
+            cout << "Offset: " << record.offset << endl;
+            return;
+        }
+    }
+
+    // If the key is not found, print an error message
+    cout << "Record not found." << endl;
+}
+
+// Function to print all index records
+void printRecords(fstream& indexFile) {
+    IndexRecord record;
+
+    cout << setw(10) << "Key" << setw(10) << "Offset" << endl;
+    cout << "-----------------------" << endl;
+
+    // Read each record and print its key and offset
+    indexFile.seekg(0, ios::beg);
+    while (indexFile.read(reinterpret_cast<char*>(&record), RECORD_SIZE)) {
+        cout << setw(10) << record.key << setw(10) << record.offset << endl;
+    }
+}
+
+int main() {
+    fstream indexFile("index.dat", ios::in | ios::out | ios::binary);
+
+    // If the index file does not exist, create it
+    if (!indexFile) {
+        indexFile.open("index.dat", ios::out | ios::binary);
+        indexFile.close();
+        indexFile.open("index.dat", ios::in | ios::out | ios::binary);
+    }
+
+    int choice;
+    do {
+        cout << endl;
+        cout << "1. Add a new record" << endl;
+        cout << "2. Search for a record" << endl;
+        cout << "3. Print all records" << endl;
+        cout << "4. Exit" << endl;
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                addRecord(indexFile);
+                break;
+            case 2:
+                searchRecord(indexFile);
+                break;
+            case 3:
+                printRecords(indexFile);
+                break;
+            case 4:
+                break;
+            default:
+                cout << "Invalid choice. Please try again." << endl;
+                break;
+        }
+    } while (choice != 4);
+
+    indexFile.close();
+    return 0;
+}
+
+
+output
+ 
+_______________________________________________________________________________________
+
+ADSL 10
+
+Python 
+
+problem statement : company maintains employee information such as employee ID, name, designation and 
+salary. Allow users to add, delete information about employees. Display information of a 
+particular employee. If an employee does not exist, an appropriate message is displayed. If 
+it is, the
+
+
+
+code:
+
+max = 20
+
+# Structure of Employee
+class employee:
+	def __init__(self):
+		self.name = ''
+		self.code = 0
+		self.designation = ''
+		self.exp = 0
+		self.age = 0
+
+num = 0
+emp = [employee() for i in range(max)]
+tempemp = [employee() for i in range(max)]
+sortemp = [employee() for i in range(max)]
+sortemp1 = [employee() for i in range(max)]
+
+# Function to build the given datatype
+def build():
+	global num, emp
+
+	print("Build The Table")
+	print("Maximum Entries can be", max)
+
+	num = int(input("Enter the number of Entries required: "))
+
+	if num > max:
+		print("Maximum number of Entries are 20")
+		num = 20
+
+	print("Enter the following data:")
+	for i in range(num):
+		emp[i].name = input("Name: ")
+		emp[i].code = int(input("Employee ID: "))
+		emp[i].designation = input("Designation: ")
+		emp[i].exp = int(input("Experience: "))
+		emp[i].age = int(input("Age: "))
+
+	showMenu()
+
+# Function to insert the data into
+# given data type
+def insert():
+	global num, emp
+
+	if num < max:
+		i = num
+		num += 1
+
+		print("Enter the information of the Employee:")
+		emp[i].name = input("Name: ")
+		emp[i].code = int(input("Employee ID: "))
+		emp[i].designation = input("Designation: ")
+		emp[i].exp = int(input("Experience: "))
+		emp[i].age = int(input("Age: "))
+	else:
+		print("Employee Table Full")
+
+	showMenu()
+
+# Function to delete record at index i
+def deleteIndex(i):
+	global num, emp
+
+	for j in range(i, num - 1):
+		emp[j].name = emp[j + 1].name
+		emp[j].code = emp[j + 1].code
+		emp[j].designation = emp[j + 1].designation
+		emp[j].exp = emp[j + 1].exp
+		emp[j].age = emp[j + 1].age
+
+# Function to delete record
+def deleteRecord():
+	global num, emp
+
+	code = int(input("Enter the Employee ID to Delete Record: "))
+
+	for i in range(num):
+		if emp[i].code == code:
+			deleteIndex(i)
+			num -= 1
+			break
+
+	showMenu()
+
+def searchRecord():
+	global num, emp
+
+	code = int(input("Enter the Employee ID to Search Record: "))
+
+	for i in range(num):
+		# If the data is found
+		if emp[i].code == code:
+			print("Name:", emp[i].name)
+			print("Employee ID:", emp[i].code)
+			print("Designation:", emp[i].designation)
+			print("Experience:", emp[i].exp)
+			print("Age:", emp[i].age)
+			break
+
+	showMenu()
+
+# Function to show menu
+def showMenu():
+	print("-------------------------GeeksforGeeks Employee Management System-------------------------\n")
+	print("Available Options:\n")
+	print("Build Table		 (1)")
+	print("Insert New Entry (2)")
+	print("Delete Entry	 (3)")
+	print("Search a Record	 (4)")
+	print("Exit			 (5)")
+
+	# Input Options
+	option = int(input())
+
+	# Call
+	if option == 1:
+		build()
+	elif option == 2 :
+		insert()
+	elif option == 3 :
+		deleteRecord()
+	elif option == 4 :
+		searchRecord()
+	elif option == 5 :
+		return
+	else:
+		print("Expected Options")
+		print("are 1/2/3/4/5")
+		showMenu()
+# Driver code
+showMenu()
+
+
+
+___________________________________________________________________________________	
+
+ADSL 11
+
+cpp
+
+Problem statement :  Dictionary stores keywords & its meanings. Provide facility for adding new keywords, 
+deleting keywords, updating values of any entry. Provide a facility to display whole data 
+sorted in ascending/ Descending order. Also, find how many maximum comparisons may 
+require for finding any keyword. Use Height balanced tree and find the complexity for finding 
+a keyword.
+
+code:
+
+#include"iostream"
+#include<string.h>
+using namespace std;
+//////////////////////////////////////////////////////////////
+//               //
+//   Name : Vivek S. Sharma         //
+//  Title : BST            //
+//               //
+//               //
+//////////////////////////////////////////////////////////////
+typedef struct node
+{
+
+ char k[20];
+ char m[20];
+ class node  *left;
+ class node * right;
+}node;
+
+class dict
+{
+public:
+ node *root;
+ void create();
+ void disp(node *);
+ void insert(node * root,node *temp);
+ int search(node *,char []);
+ int update(node *,char []);
+ node* del(node *,char []);
+ node * min(node *);
+};
+
+void dict :: create()
+{
+ class node *temp;
+ int ch;
+
+ do
+ {
+  temp = new node;
+  cout<<"\nEnter Keyword:";
+  cin>>temp->k;
+  cout<<"\nEnter Meaning:";
+  cin>>temp->m;
+
+  temp->left = NULL;
+  temp->right = NULL;
+
+  if(root == NULL)
+  {
+   root = temp;
+  }
+  else
+  {
+   insert(root, temp);
+  }
+  cout<<"\nDo u want to add more (y=1/n=0):";
+  cin>>ch;
+ }
+ while(ch == 1);
+
+}
+
+void dict ::  insert(node * root,node *temp)
+{
+ if(strcmp (temp->k, root->k) < 0 )
+ {
+  if(root->left == NULL)
+   root->left = temp;
+  else
+   insert(root->left,temp);
+ }
+ else
+ { if(root->right == NULL)
+   root->right = temp;
+  else
+   insert(root->right,temp);
+ }
+
+}
+
+void dict:: disp(node * root)
+{
+ if( root != NULL)
+ {
+  disp(root->left);
+  cout<<"\n Key Word :"<<root->k;
+  cout<<"\t Meaning :"<<root->m;
+  disp(root->right);
+ }
+}
+
+int dict :: search(node * root,char k[20])
+{
+ int c=0;
+ while(root != NULL)
+ {
+  c++;
+  if(strcmp (k,root->k) == 0)
+  {
+   cout<<"\nNo of Comparisons:"<<c;
+   return 1;
+  }
+  if(strcmp (k, root->k) < 0)
+   root = root->left;
+  if(strcmp (k, root->k) > 0)
+   root = root->right;
+ }
+
+ return -1;
+}
+int dict :: update(node * root,char k[20])
+{
+ while(root != NULL)
+ {
+  if(strcmp (k,root->k) == 0)
+  {
+   cout<<"\nEnter New Meaning ofKeyword"<<root->k;
+   cin>>root->m;
+   return 1;
+  }
+  if(strcmp (k, root->k) < 0)
+   root = root->left;
+  if(strcmp (k, root->k) > 0)
+   root = root->right;
+ }
+ return -1;
+}
+node* dict :: del(node * root,char k[20])
+{
+ node *temp;
+
+ if(root == NULL)
+ {
+  cout<<"\nElement No Found";
+  return root;
+ }
+
+ if (strcmp(k,root->k) < 0)
+ {
+  root->left = del(root->left, k);
+  return root;
+ }
+ if (strcmp(k,root->k) > 0)
+ {
+   root->right = del(root->right, k);
+   return root;
+ }
+
+ if (root->right==NULL&&root->left==NULL)
+ {
+  temp = root;
+  delete temp;
+  return NULL;
+  }
+  if(root->right==NULL)
+  {
+  temp = root;
+  root = root->left;
+  delete temp;
+  return root;
+  }
+  else if(root->left==NULL)
+  {
+  temp = root;
+  root = root->right;
+  delete temp;
+  return root;
+  }
+  temp = min(root->right);
+  strcpy(root->k,temp->k);
+  root->right = del(root->right, temp->k);
+  return root;
+
+}
+
+node * dict :: min(node *q)
+{
+ while(q->left != NULL)
+ {
+  q = q->left;
+ }
+ return q;
+}
+
+
+
+int main()
+{
+ int ch;
+ dict d;
+ d.root = NULL;
+
+
+ do
+ {
+  cout<<"\nMenu\n1.Create\n2.Disp\n3.Search\n4.Update\n5.Delete\nEnter Ur CH:";
+  cin>>ch;
+
+  switch(ch)
+  {
+case 1: d.create();
+  break;
+case 2: if(d.root == NULL)
+  {
+  cout<<"\nNo any Keyword";
+  }
+  else
+  {
+  d.disp(d.root);
+  }
+  break;
+case 3: if(d.root == NULL)
+ {
+  cout<<"\nDictionary is Empty. First add keywords then try again ";
+ }
+  else
+ {
+
+        cout<<"\nEnter Keyword which u want to search:";
+  char k[20];
+  cin>>k;
+
+  if( d.search(d.root,k) == 1)
+  cout<<"\nKeyword Found";
+  else
+  cout<<"\nKeyword Not Found";
+ }
+  break;
+case 4:
+  if(d.root == NULL)
+  {
+  cout<<"\nDictionary is Empty. First add keywords then try again ";
+ }
+  else
+  {
+  cout<<"\nEnter Keyword which meaning  want to update:";
+  char k[20];
+  cin>>k;
+  if(d.update(d.root,k) == 1)
+  cout<<"\nMeaning Updated";
+  else
+  cout<<"\nMeaning Not Found";
+  }
+  break;
+case 5:
+  if(d.root == NULL)
+  {
+  cout<<"\nDictionary is Empty. First add keywords then try again ";
+  }
+  else
+  {
+  cout<<"\nEnter Keyword which u want to delete:";
+  char k[20];
+  cin>>k;
+  if(d.root == NULL)
+  {
+  cout<<"\nNo any Keyword";
+  }
+  else
+  {
+  d.root = d.del(d.root,k);
+    }
+   }
+  }
+ }
+ while(ch<=5);
+ return 0;
+
+}
+
+
+
+
+
+_________________________________________________________________________________
+ADSL 12
+
+Problem Statement: Heap sort
+
+
+Code: 
+
+
+#include <iostream>
+using namespace std;
+
+// To heapify a subtree rooted with node i which is
+// an index in arr[]. n is size of heap
+void heapify(int arr[], int n, int i)
+{
+    int largest = i; // Initialize largest as root Since we are using 0 based indexing
+    int l = 2 * i + 1; // left = 2*i + 1
+    int r = 2 * i + 2; // right = 2*i + 2
+ 
+    // If left child is larger than root
+    if (l < n && arr[l] > arr[largest])
+        largest = l;
+ 
+    // If right child is larger than largest so far
+    if (r < n && arr[r] > arr[largest])
+        largest = r;
+ 
+    // If largest is not root
+    if (largest != i) {
+        swap(arr[i], arr[largest]);
+ 
+        // Recursively heapify the affected sub-tree
+        heapify(arr, n, largest);
+    }
+}
+
+// main function to do heap sort
+void heapSort(int arr[], int n)
+{
+     // Build heap (rearrange array)
+    for (int i = n / 2 - 1; i >= 0; i--)
+        heapify(arr, n, i);
+ 
+    // One by one extract an element from heap
+    for (int i = n - 1; i >= 0; i--) {
+        // Move current root to end
+        swap(arr[0], arr[i]);
+ 
+        // call max heapify on the reduced heap
+        heapify(arr, i, 0);
+    }
+}
+
+/* A utility function to print array of size n */
+void printArray(int arr[], int n)
+{
+    for (int i = 0; i < n; ++i)
+        cout << arr[i] << " ";
+    cout << "\n";
+}
+
+// Driver program
+int main()
+{
+    int n;
+    cout << "Enter the size of the array: ";
+    cin >> n;
+    int arr[n];
+    cout << "Enter " << n << " integers:\n";
+    for (int i = 0; i < n; ++i) {
+        cin >> arr[i];
+    }
+
+    cout << "Before heapifying, the array is:\n";
+    printArray(arr, n);
+
+    // heapify the array
+    for(int i=n/2 -1;i>=0;i--){
+        heapify(arr,n,i);
+    }
+
+    cout << "After heapifying, the array is:\n";
+    printArray(arr, n);
+
+    // sort the array using heap sort
+    heapSort(arr, n);
+
+    cout << "Sorted array is:\n";
+    printArray(arr, n);
+
+    return 0;
+}
+
+
+
+
+ 
